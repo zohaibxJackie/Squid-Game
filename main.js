@@ -117,12 +117,14 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         function checkPlayerStatus() {
-            if (dollLooking && moving) {
-                playerOutSound.play();
-                showEliminationPopup();
-                dollTurn = false;
-                resetGame();
-            }
+            setTimeout(() => {
+                if (dollLooking && moving) {
+                    playerOutSound.play();
+                    showEliminationPopup();
+                    dollTurn = false;
+                    resetGame();
+                }
+            }, 100);
         }
 
         function setDollLooking(isLooking) {
