@@ -1,0 +1,314 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+*,
+*::after,
+*::before {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+img,
+picture,
+svg,
+video {
+    max-width: 100%;
+    height: auto;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-size: inherit;
+}
+
+button {
+    font-family: inherit;
+}
+
+:root {
+    --primary-font: "Press Start 2P", serif;
+    --fontt-400: 400;
+    --fontt-500: 500;
+    --fontt-700: 700;
+    --button-gradient: hsl(349, 71%, 52%), hsl(349, 70%, 56%);
+    --background: hsl(214, 47%, 23%), hsl(237, 49%, 15%);
+    --white: #fff;
+    --score-text-color: hsl(229, 64%, 46%);
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(var(--background));
+    font-family: var(--primary-font);
+}
+
+.wrapper {
+    position: relative;
+    max-width: 768px;
+    height: 100vh;
+    width: 100%;
+    margin: 0 auto;
+    overflow-x: hidden;
+}
+
+.clock {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--white);
+    padding: 1rem;
+    border-radius: 3px;
+    color: var(--score-text-color);
+
+    .time {
+        font-size: 1.5em;
+    }
+}
+
+.playground {
+    position: relative;
+
+    #playground-img {
+        height: 250px;
+        width: 100%;
+    }
+
+    #player {
+        position: absolute;
+        width: 50px;
+        left: 0;
+        bottom: 20px;
+    }
+}
+
+.controllers {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+
+    #doll {
+        width: 150px;
+        height: 200px;
+    }
+
+    #moveButton {
+        position: relative;
+        padding: clamp(2.5rem, 13vw + 0.5rem, 5rem);
+        border-radius: 500px;
+        margin-right: 0.5rem;
+        border: 1rem solid hsl(349, 70%, 56%);
+
+        span {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            position: absolute;
+            font-family: var(--primary-font);
+        }
+    }
+}
+
+/* --------------------- General styles for the modal --------------------- */
+.modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    /* Dark semi-transparent background */
+    z-index: 1000;
+    overflow: auto;
+    padding: 1rem 0;
+}
+
+/* Content box inside the modal */
+.modal-content {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Modal heading */
+.modal-content h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* List styles */
+.modal-content ul {
+    text-align: left;
+    margin: 10px 0;
+    padding: 0;
+    list-style: none;
+}
+
+.modal-content ul li {
+    margin-bottom: 10px;
+    color: #555;
+    line-height: 1.5;
+}
+
+.modal-content ul li ul {
+    margin-left: 20px;
+    list-style: disc;
+}
+
+.modal-content ul li ul li {
+    margin-bottom: 5px;
+    color: #666;
+}
+
+/* Button styles */
+/* Button styles */
+#startGameButton {
+    background-color: #28a745;
+    /* Initial color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px;
+    animation: colorChange 2s infinite;
+    /* Add infinite color-changing animation */
+    transition: background-color 0.3s;
+}
+
+/* Hover effect to pause the animation */
+@media (hover: hover) {
+    #startGameButton:hover {
+        animation-play-state: paused;
+        background-color: #218838;
+        /* Set a static color when hovered */
+    }
+}
+
+/* Keyframes for the color change animation */
+@keyframes colorChange {
+    0% {
+        background-color: #28a745;
+        /* Green */
+    }
+
+    25% {
+        background-color: #007bff;
+        /* Blue */
+    }
+
+    50% {
+        background-color: #ffc107;
+        /* Yellow */
+    }
+
+    75% {
+        background-color: #dc3545;
+        /* Red */
+    }
+
+    100% {
+        background-color: #28a745;
+        /* Back to Green */
+    }
+}
+
+
+/* Animation for modal */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+/* ------------------------ Popup container ------------------------------- */
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Black with transparency */
+    display: none; /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  /* Popup content */
+  .popup-content {
+    background-color: #fff;
+    padding: 20px 30px;
+    border-radius: 10px;
+    text-align: center;
+    width: 300px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    animation: scaleIn 0.3s ease-out; /* Animation effect */
+  }
+  
+  /* Heading style */
+  .popup-content h2 {
+    color: #dc3545; /* Red for 'eliminated' */
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  /* Paragraph style */
+  .popup-content p {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  /* Button style */
+  #playAgainButton {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  /* Button hover */
+  #playAgainButton:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Popup animation */
+  @keyframes scaleIn {
+    0% {
+      transform: scale(0.7);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red light, Green light</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="wrapper">
+        <div id="gameRulesModal" class="modal">
+            <div class="modal-content">
+                <h2>Welcome Player <br> Game Rules: Red Light, Green Light</h2>
+                <ul>
+                    <li><strong>Objective:</strong> Reach the finish line before the timer runs out to win the game.
+                    </li>
+                    <li>
+                        <strong>How to Play:</strong>
+                        <ul>
+                            <li>Press the <strong>START</strong> button to move the player forward.</li>
+                            <li>Press the <strong>STOP</strong> button to stop the player.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>The Doll's Movements:</strong>
+                        <ul>
+                            <li>When the doll is facing <strong>back</strong> (green light), you are safe to move.</li>
+                            <li>When the doll is facing <strong>front</strong> (red light), you must <strong>STOP
+                                    immediately</strong>.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Game Over Conditions:</strong></li>
+                    <ul>
+                        <li>If you are moving while the doll is watching (red light), you will be
+                            <strong>eliminated</strong>.
+                        </li>
+                        <li>If the timer runs out before you reach the finish line, you lose.</li>
+                    </ul>
+                    <li><strong>Winning Condition:</strong> Reach the finish line without being eliminated, and within
+                        the given time, to win the game.</li>
+                    <li>
+                        <strong>Tips:</strong>
+                        <ul>
+                            <li>Be quick but cautious.</li>
+                            <li>Pay attention to the doll’s movements and stop immediately when it turns to face you.
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <button id="startGameButton">Start Game</button>
+            </div>
+        </div>
+
+        <div id="eliminationPopup" class="popup">
+            <div class="popup-content">
+                <h2>Player Eliminated</h2>
+                <button id="playAgainButton">Play Again</button>
+            </div>
+        </div>
+
+
+        <div class="clock">
+            <p class="time">00 : <span id="countdown">30</span>s</p>
+        </div>
+        <div class="playground">
+            <img src="./Assets/background .png" alt="background image" id="playground-img">
+            <img src="./Assets/player.png" alt="player" id="player">
+        </div>
+        <div class="controllers">
+            <div id="doll">
+                <img src="./Assets/doll front.png" alt="doll" id="dollImage">
+            </div>
+            <button id="moveButton"><span>START</span></button>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+
+</html>
