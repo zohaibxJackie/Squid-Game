@@ -19,6 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let dollTurnInterval; // Variable to control doll turning
     let dollTurn = true;
 
+    // start again after winning
+    let winPopup = document.getElementById('winPopup');
+    const playAgainAfterWin = document.getElementById('winPlayAgainButton');
+
     // Select the popup and button
     const eliminationPopup = document.getElementById('eliminationPopup');
     const playAgainButton = document.getElementById('playAgainButton');
@@ -32,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (countdownTime === 0) {
                 clearInterval(countdown);
-                alert('Time is up! Game Over!');
                 resetGame();
             } else {
                 countdownTime--;
@@ -43,6 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function startGame() {
         // Hide rules and reset game
         rulesPage.style.display = 'none';
+
+        // Hide winning popup
+        winPopup.style.display = 'none';
+
         resetGame();
 
         // Start countdown
@@ -108,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const playerWidth = player.offsetWidth / 2;
                     if (position >= wrapperWidth - playerWidth) {
                         clearInterval(moveInterval);
-                        alert('You Win!');
+                        showWinningPopup();
                         resetGame();
                     }
                 }, 20);
@@ -155,6 +162,10 @@ document.addEventListener('DOMContentLoaded', () => {
         eliminationPopup.style.display = 'none';
         startGame();
     });
+    
+    playAgainAfterWin.onclick = () => {
+        startGame();
+    }
 
     function showEliminationPopup() {
         // Stop doll-related actions
@@ -164,5 +175,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Show elimination popup
         eliminationPopup.style.display = 'flex';
+    }
+
+    function showWinningPopup() {
+        winPopup.style.display = 'flex';
     }
 });
