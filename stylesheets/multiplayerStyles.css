@@ -1,0 +1,11 @@
+:root {
+    --primary-font: "Press Start 2P", serif;
+    --fontt-400: 400;
+    --fontt-500: 500;
+    --fontt-700: 700;
+    --button-gradient: hsl(349, 71%, 52%), hsl(349, 70%, 56%);
+    --background: hsl(214, 47%, 23%), hsl(237, 49%, 15%);
+    --white: #fff;
+    --score-text-color: hsl(229, 64%, 46%);
+}
+

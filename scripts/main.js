@@ -1,17 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
     const rulesPage = document.querySelector('.modal');
     const startButton = document.querySelector('#startGameButton');
-    const player = document.getElementById('player'); 
-    let position = 0; 
-    const speed = 0.8; 
-    const moveButton = document.getElementById('moveButton'); 
-    let moving = false; 
-    let moveInterval; 
+    const player = document.getElementById('player');
+    let position = 0;
+    const speed = 0.8;
+    const moveButton = document.getElementById('moveButton');
+    let moving = false;
+    let moveInterval;
     let btnText = document.querySelector('#moveButton span');
-    const wrapper = document.querySelector('.wrapper'); 
-    const dollImage = document.getElementById('dollImage'); 
+    const wrapper = document.querySelector('.wrapper');
+    const dollImage = document.getElementById('dollImage');
     const sound = new Audio('./Assets/doll sound.mp3');
-    const playerOutSound = new Audio('./Assets/death sound.mp3'); 
+    const playerOutSound = new Audio('./Assets/death sound.mp3');
     let soundPlaying = false;
     let dollLooking = false;
     let countdown;
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
         function turnDollFront() {
             setTimeout(() => {
                 sound.pause();
-            }, 50);  
+            }, 50);
             dollImage.src = './Assets/doll front.png';
             sound.currentTime = 0;
             soundPlaying = false;
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         turnDollBack();
 
         function randomDollTurn() {
-            const randomTime = Math.floor(Math.random() * 3000) + 2000;            
+            const randomTime = Math.floor(Math.random() * 3000) + 2000;
 
             dollTurnInterval = setTimeout(() => {
                 if (!soundPlaying) {
@@ -96,14 +96,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Movement logic
         moveButton.onclick = () => {
-            
+
             if (moving) {
-                
+
                 clearInterval(moveInterval);
                 moving = false;
                 btnText.innerText = "START";
             } else {
-                
+
                 btnText.innerText = "STOP";
                 moving = true;
                 moveInterval = setInterval(() => {
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resetGame() {
-        
+
         // Stop all intervals and reset variables
         playerOutSound.currentTime = 0;
         position = 0;
@@ -152,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
         sound.pause();
         sound.currentTime = 0;
         clearTimeout(dollTurnInterval); // Stop doll turning
-        console.log('resetting game');
     }
 
     startButton.addEventListener('click', startGame);
@@ -162,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         eliminationPopup.style.display = 'none';
         startGame();
     });
-    
+
     playAgainAfterWin.onclick = () => {
         startGame();
     }

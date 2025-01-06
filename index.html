@@ -9,11 +9,13 @@
     <link rel="icon" type="image/png" sizes="16x16" href="./Assets/favicon_io/favicon-16x16.png">
     <link rel="manifest" href="./Assets/favicon_io/site.webmanifest">
     <title>Red light, Green light</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./stylesheets/style.css">
+    <link rel="stylesheet" href="/stylesheets/multiplayerStyles.css">
 </head>
 
 <body>
     <div class="wrapper">
+        <!-- This container will show the rules of the game -->
         <div id="gameRulesModal" class="modal">
             <div class="modal-content">
                 <h2>Welcome Player <br> Game Rules: Red Light, Green Light</h2>
@@ -57,6 +59,7 @@
             </div>
         </div>
 
+        <!-- When player is eliminated, this will show the popup -->
         <div id="eliminationPopup" class="popup">
             <div class="popup-content">
                 <h2>Player Eliminated</h2>
@@ -64,6 +67,7 @@
             </div>
         </div>
 
+        <!-- when the player wins, this popup will be shown -->
         <div id="winPopup">
             <div class="win-popup-content">
                 <h2>🎈Congratulations✨</h2>
@@ -72,23 +76,36 @@
             </div>
         </div>
 
-
+        <!-- This is the clock in the top -->
         <div class="clock">
             <p class="time">00 : <span id="countdown"></span>s</p>
         </div>
+
+        <!-- This is the main playground like where the player moves -->
         <div class="playground">
             <img src="./Assets/background .png" alt="background image" id="playground-img">
             <img src="./Assets/player.png" alt="player" id="player">
         </div>
+
+        <!-- This is where the doll and start stop button will appear -->
         <div class="controllers">
             <div id="doll">
                 <img src="./Assets/doll front.png" alt="doll" id="dollImage">
             </div>
             <button id="moveButton"><span>START</span></button>
         </div>
+
+        <!-- This popup will give the user to choose multiplayer or singleplayer -->
+         <!-- <div class="choosePopup">
+            <div class="choosePopupContent">
+                <p>Choose mode</p>
+                <button>Single Player</button>
+                <button>Multi Player</button>
+            </div>
+         </div> -->
     </div>
 
-    <script src="main.js"></script>
+    <script src="./scripts/main.js"></script>
 </body>
 
 </html>
