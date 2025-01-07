@@ -118,7 +118,6 @@ body {
 
 /* --------------------- General styles for the modal --------------------- */
 .modal {
-    /* display: none; */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -324,17 +323,17 @@ body {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.7); /* Black with transparency */
-    display: none; /* Hidden by default */
+    display: none;
     justify-content: center;
     align-items: center;
     z-index: 1000;
   }
   .win-popup-content {
     background-color: #fff;
-    padding: 20px 30px;
+    padding: 20px 10px;
     border-radius: 10px;
     text-align: center;
-    width: auto;
+    max-width: 90%;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     animation: scaleIn 0.3s ease-out; /* Animation effect */
   }
@@ -342,8 +341,9 @@ body {
   /* Heading style */
   .win-popup-content h2 {
     color: rgb(0, 199, 0); /* Red for 'eliminated' */
-    font-size: 24px;
+    font-size: 1.2rem;
     margin-bottom: 10px;
+    text-align: center;
   }
   
   /* Paragraph style */
