@@ -16,6 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const playersList = document.getElementById('playersList');
     const startGameBtn = document.getElementById('startGameBtn');
     const waitingText = document.getElementById('waitingText');
+    const difficultySection = document.getElementById('difficultySection');
+    const difficultyDisplay = document.getElementById('difficultyDisplay');
+    const currentDifficulty = document.getElementById('currentDifficulty');
+    const difficultyBtns = document.querySelectorAll('.difficulty-btn');
 
     const clock = document.querySelector('.clock');
     const playground = document.querySelector('.playground');
@@ -84,6 +88,23 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.emit('joinRoom', { roomCode: code, playerName: name });
     };
 
+    difficultyBtns.forEach(btn => {
+        btn.onclick = () => {
+            if (!isHost) return;
+            const difficulty = btn.dataset.difficulty;
+            socket.emit('setDifficulty', difficulty);
+            difficultyBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        };
+    });
+
+    socket.on('difficultyChanged', (difficulty) => {
+        currentDifficulty.textContent = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+        difficultyBtns.forEach(b => {
+            b.classList.toggle('active', b.dataset.difficulty === difficulty);
+        });
+    });
+
     socket.on('roomCreated', (data) => {
         myPlayerId = data.playerId;
         roomCode = data.roomCode;
@@ -111,6 +132,8 @@ document.addEventListener('DOMContentLoaded', () => {
             isHost = true;
             startGameBtn.style.display = 'block';
             waitingText.style.display = 'none';
+            difficultySection.style.display = 'block';
+            difficultyDisplay.style.display = 'none';
         }
         updatePlayersList(data.players);
         
@@ -129,9 +152,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isHost) {
             startGameBtn.style.display = 'block';
             waitingText.style.display = 'none';
+            difficultySection.style.display = 'block';
+            difficultyDisplay.style.display = 'none';
         } else {
             startGameBtn.style.display = 'none';
             waitingText.style.display = 'block';
+            difficultySection.style.display = 'none';
+            difficultyDisplay.style.display = 'block';
         }
     }
 

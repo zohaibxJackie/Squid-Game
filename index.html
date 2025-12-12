@@ -46,6 +46,16 @@
                 <h2>Waiting Room</h2>
                 <p class="room-code">Room Code: <span id="displayRoomCode"></span></p>
                 <div id="playersList" class="players-list"></div>
+                <div id="difficultySection" class="difficulty-section" style="display: none;">
+                    <p class="difficulty-label">Difficulty:</p>
+                    <div class="difficulty-buttons">
+                        <button class="difficulty-btn" data-difficulty="easy">Easy</button>
+                        <button class="difficulty-btn active" data-difficulty="normal">Normal</button>
+                        <button class="difficulty-btn" data-difficulty="hard">Hard</button>
+                        <button class="difficulty-btn" data-difficulty="insane">Insane</button>
+                    </div>
+                </div>
+                <p id="difficultyDisplay" class="difficulty-display" style="display: none;">Difficulty: <span id="currentDifficulty">Normal</span></p>
                 <button id="startGameBtn" class="lobby-btn start-btn" style="display: none;">Start Game</button>
                 <p class="waiting-text" id="waitingText">Waiting for host to start...</p>
             </div>

@@ -171,6 +171,68 @@
     margin-top: 10px;
 }
 
+.difficulty-section {
+    margin: 15px 0;
+}
+
+.difficulty-label {
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.difficulty-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.difficulty-btn {
+    padding: 8px 12px;
+    font-size: 10px;
+    font-family: var(--primary-font);
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.difficulty-btn:hover {
+    background-color: #e9ecef;
+}
+
+.difficulty-btn.active {
+    border-color: #007bff;
+    background-color: #007bff;
+    color: white;
+}
+
+.difficulty-btn[data-difficulty="easy"].active {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.difficulty-btn[data-difficulty="hard"].active {
+    background-color: #fd7e14;
+    border-color: #fd7e14;
+}
+
+.difficulty-btn[data-difficulty="insane"].active {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.difficulty-display {
+    font-size: 11px;
+    margin: 10px 0;
+}
+
+.difficulty-display span {
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
 #playersContainer {
     position: absolute;
     width: 100%;

@@ -18,6 +18,13 @@ const rooms = new Map();
 
 const PLAYER_COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F'];
 
+const DIFFICULTY_SETTINGS = {
+  easy: { time: 50, dollMinTime: 3000, dollMaxTime: 5000 },
+  normal: { time: 40, dollMinTime: 2000, dollMaxTime: 4000 },
+  hard: { time: 30, dollMinTime: 1000, dollMaxTime: 2500 },
+  insane: { time: 20, dollMinTime: 500, dollMaxTime: 1500 }
+};
+
 function generateRoomCode() {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
@@ -32,7 +39,8 @@ function createRoom(hostId, hostName) {
     dollLooking: false,
     countdownTime: 40,
     countdownInterval: null,
-    dollInterval: null
+    dollInterval: null,
+    difficulty: 'normal'
   });
   return roomCode;
 }
@@ -111,6 +119,16 @@ io.on('connection', (socket) => {
     });
   });
 
+  socket.on('setDifficulty', (difficulty) => {
+    const room = rooms.get(socket.roomCode);
+    if (!room || room.host !== socket.id) return;
+    if (room.gameState !== 'waiting') return;
+    if (!DIFFICULTY_SETTINGS[difficulty]) return;
+    
+    room.difficulty = difficulty;
+    io.to(socket.roomCode).emit('difficultyChanged', difficulty);
+  });
+
   socket.on('startGame', () => {
     const room = rooms.get(socket.roomCode);
     if (!room || room.host !== socket.id) return;
@@ -119,8 +137,10 @@ io.on('connection', (socket) => {
     clearInterval(room.countdownInterval);
     clearTimeout(room.dollInterval);
 
+    const settings = DIFFICULTY_SETTINGS[room.difficulty] || DIFFICULTY_SETTINGS.normal;
+
     room.gameState = 'playing';
-    room.countdownTime = 40;
+    room.countdownTime = settings.time;
     room.dollLooking = false;
 
     room.players.forEach(player => {
@@ -131,7 +151,9 @@ io.on('connection', (socket) => {
     });
 
     io.to(socket.roomCode).emit('gameStarted', {
-      players: Array.from(room.players.values())
+      players: Array.from(room.players.values()),
+      difficulty: room.difficulty,
+      time: settings.time
     });
 
     room.countdownInterval = setInterval(() => {
@@ -150,6 +172,10 @@ io.on('connection', (socket) => {
     const room = rooms.get(roomCode);
     if (!room) return;
 
+    const settings = DIFFICULTY_SETTINGS[room.difficulty] || DIFFICULTY_SETTINGS.normal;
+    const minTime = settings.dollMinTime;
+    const maxTime = settings.dollMaxTime;
+
     function turnDoll() {
       if (room.gameState !== 'playing') return;
 
@@ -160,11 +186,11 @@ io.on('connection', (socket) => {
         checkPlayersMoving(roomCode);
       }
 
-      const nextTurn = Math.floor(Math.random() * 3000) + 2000;
+      const nextTurn = Math.floor(Math.random() * (maxTime - minTime)) + minTime;
       room.dollInterval = setTimeout(turnDoll, nextTurn);
     }
 
-    const initialDelay = Math.floor(Math.random() * 2000) + 1000;
+    const initialDelay = Math.floor(Math.random() * minTime) + (minTime / 2);
     room.dollInterval = setTimeout(turnDoll, initialDelay);
   }
 
