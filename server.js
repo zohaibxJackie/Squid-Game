@@ -15,6 +15,7 @@ const io = new Server(server, {
 app.use(express.static(path.join(__dirname)));
 
 const rooms = new Map();
+const voiceChatRooms = new Map();
 
 const PLAYER_COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F'];
 
@@ -63,7 +64,8 @@ io.on('connection', (socket) => {
       eliminated: false,
       finished: false,
       moving: false,
-      color: getPlayerColor(0)
+      color: getPlayerColor(0),
+      wins: 0
     });
 
     socket.join(roomCode);
@@ -101,7 +103,8 @@ io.on('connection', (socket) => {
       eliminated: false,
       finished: false,
       moving: false,
-      color: getPlayerColor(room.players.size)
+      color: getPlayerColor(room.players.size),
+      wins: 0
     });
 
     socket.join(roomCode);
@@ -117,6 +120,11 @@ io.on('connection', (socket) => {
       player: room.players.get(socket.id),
       players: Array.from(room.players.values())
     });
+  });
+
+  socket.on('leaveRoom', () => {
+    handlePlayerLeave(socket);
+    socket.emit('leftRoom');
   });
 
   socket.on('setDifficulty', (difficulty) => {
@@ -233,6 +241,10 @@ io.on('connection', (socket) => {
 
     const winners = Array.from(room.players.values()).filter(p => p.finished);
     
+    winners.forEach(winner => {
+      winner.wins = (winner.wins || 0) + 1;
+    });
+    
     io.to(roomCode).emit('gameEnded', {
       reason,
       winners,
@@ -302,28 +314,87 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('disconnect', () => {
-    console.log('Player disconnected:', socket.id);
+  socket.on('voiceChatJoin', (roomCode) => {
+    if (!voiceChatRooms.has(roomCode)) {
+      voiceChatRooms.set(roomCode, new Set());
+    }
     
+    const voiceRoom = voiceChatRooms.get(roomCode);
+    const existingPeers = Array.from(voiceRoom);
+    voiceRoom.add(socket.id);
+    
+    socket.emit('voiceChatPeers', existingPeers);
+    
+    existingPeers.forEach(peerId => {
+      io.to(peerId).emit('voiceChatNewPeer', socket.id);
+    });
+  });
+
+  socket.on('voiceChatLeave', (roomCode) => {
+    const voiceRoom = voiceChatRooms.get(roomCode);
+    if (voiceRoom) {
+      voiceRoom.delete(socket.id);
+      socket.to(roomCode).emit('voiceChatUserLeft', socket.id);
+    }
+  });
+
+  socket.on('voiceOffer', (data) => {
+    io.to(data.to).emit('voiceOffer', {
+      from: socket.id,
+      offer: data.offer
+    });
+  });
+
+  socket.on('voiceAnswer', (data) => {
+    io.to(data.to).emit('voiceAnswer', {
+      from: socket.id,
+      answer: data.answer
+    });
+  });
+
+  socket.on('voiceIceCandidate', (data) => {
+    io.to(data.to).emit('voiceIceCandidate', {
+      from: socket.id,
+      candidate: data.candidate
+    });
+  });
+
+  function handlePlayerLeave(socket) {
     const room = rooms.get(socket.roomCode);
     if (!room) return;
 
+    const leavingPlayerId = socket.id;
     room.players.delete(socket.id);
+
+    const voiceRoom = voiceChatRooms.get(socket.roomCode);
+    if (voiceRoom) {
+      voiceRoom.delete(socket.id);
+      socket.to(socket.roomCode).emit('voiceChatUserLeft', socket.id);
+    }
 
     if (room.players.size === 0) {
       clearInterval(room.countdownInterval);
       clearTimeout(room.dollInterval);
       rooms.delete(socket.roomCode);
+      voiceChatRooms.delete(socket.roomCode);
     } else {
       if (room.host === socket.id) {
         room.host = room.players.keys().next().value;
       }
       io.to(socket.roomCode).emit('playerLeft', {
-        playerId: socket.id,
+        playerId: leavingPlayerId,
         newHost: room.host,
         players: Array.from(room.players.values())
       });
     }
+
+    socket.leave(socket.roomCode);
+    socket.roomCode = null;
+  }
+
+  socket.on('disconnect', () => {
+    console.log('Player disconnected:', socket.id);
+    handlePlayerLeave(socket);
   });
 });
 

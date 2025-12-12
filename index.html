@@ -33,7 +33,7 @@
                     <input type="text" id="roomCodeInput" placeholder="Enter Room Code" maxlength="6">
                     <div class="lobby-buttons">
                         <button id="joinRoomBtn" class="lobby-btn join-btn">Join</button>
-                        <button id="backBtn" class="lobby-btn">Back</button>
+                        <button id="backBtn" class="lobby-btn back-btn">Back</button>
                     </div>
                 </div>
 
@@ -56,8 +56,15 @@
                     </div>
                 </div>
                 <p id="difficultyDisplay" class="difficulty-display" style="display: none;">Difficulty: <span id="currentDifficulty">Normal</span></p>
+                
+                <div class="voice-chat-section">
+                    <button id="voiceChatBtn" class="lobby-btn voice-btn">Voice Chat</button>
+                    <span id="voiceChatStatus" class="voice-status">Voice: OFF</span>
+                </div>
+                
                 <button id="startGameBtn" class="lobby-btn start-btn" style="display: none;">Start Game</button>
                 <p class="waiting-text" id="waitingText">Waiting for host to start...</p>
+                <button id="leaveRoomBtn" class="lobby-btn leave-btn">Leave Room</button>
             </div>
         </div>
 
@@ -124,7 +131,7 @@
                 <div id="gameEndMessage"></div>
                 <div class="popup-btns">
                 <button id="playAgainBtn" class="lobby-btn" style="display: none;">Play Again</button>
-                <button id="backToLobbyBtn" class="lobby-btn">Back to Lobby</button>
+                <button id="backToLobbyBtn" class="lobby-btn">Leave Game</button>
                 </div>
             </div>
         </div>

@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const difficultyDisplay = document.getElementById('difficultyDisplay');
     const currentDifficulty = document.getElementById('currentDifficulty');
     const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+    const leaveRoomBtn = document.getElementById('leaveRoomBtn');
 
     const clock = document.querySelector('.clock');
     const playground = document.querySelector('.playground');
@@ -37,8 +38,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const playAgainBtn = document.getElementById('playAgainBtn');
     const backToLobbyBtn = document.getElementById('backToLobbyBtn');
 
-    const sound = new Audio('./Assets/doll sound.mp3');
-    const playerOutSound = new Audio('./Assets/death sound.mp3');
+    const sound = new Audio();
+    const playerOutSound = new Audio();
+    sound.src = './Assets/doll sound.mp3';
+    playerOutSound.src = './Assets/death sound.mp3';
 
     let myPlayerId = null;
     let isHost = false;
@@ -50,8 +53,64 @@ document.addEventListener('DOMContentLoaded', () => {
     let isEliminated = false;
     let isFinished = false;
     let dollLooking = false;
+    let audioUnlocked = false;
+    let savedPlayerName = '';
+
+    const dollFrontImg = new Image();
+    const dollBackImg = new Image();
+    let imagesLoaded = 0;
+    let imagesPreloaded = false;
+
+    function preloadImages() {
+        const checkAllLoaded = () => {
+            imagesLoaded++;
+            if (imagesLoaded >= 2) {
+                imagesPreloaded = true;
+                console.log('All doll images preloaded');
+            }
+        };
+        
+        dollFrontImg.onload = checkAllLoaded;
+        dollFrontImg.onerror = checkAllLoaded;
+        dollBackImg.onload = checkAllLoaded;
+        dollBackImg.onerror = checkAllLoaded;
+        
+        dollFrontImg.src = './Assets/doll front.png';
+        dollBackImg.src = './Assets/doll back.png';
+    }
+
+    preloadImages();
+
+    function unlockAudio() {
+        if (audioUnlocked) return;
+        
+        document.removeEventListener('click', unlockAudio);
+        document.removeEventListener('touchstart', unlockAudio);
+        
+        sound.volume = 0;
+        sound.play().then(() => {
+            sound.pause();
+            sound.currentTime = 0;
+            sound.volume = 1;
+            audioUnlocked = true;
+            console.log('Audio context unlocked');
+        }).catch(() => {
+            console.log('Audio unlock failed, will try again on next interaction');
+        });
+        
+        playerOutSound.volume = 0;
+        playerOutSound.play().then(() => {
+            playerOutSound.pause();
+            playerOutSound.currentTime = 0;
+            playerOutSound.volume = 1;
+        }).catch(() => {});
+    }
+
+    document.addEventListener('click', unlockAudio);
+    document.addEventListener('touchstart', unlockAudio);
 
     showJoinBtn.onclick = () => {
+        unlockAudio();
         nameInputSection.style.display = 'none';
         joinRoomSection.style.display = 'block';
         lobbyError.textContent = '';
@@ -63,16 +122,35 @@ document.addEventListener('DOMContentLoaded', () => {
         lobbyError.textContent = '';
     };
 
+    if (leaveRoomBtn) {
+        leaveRoomBtn.onclick = () => {
+            socket.emit('leaveRoom');
+        };
+    }
+
+    socket.on('leftRoom', () => {
+        waitingRoom.style.display = 'none';
+        lobbyModal.style.display = 'flex';
+        nameInputSection.style.display = 'block';
+        joinRoomSection.style.display = 'none';
+        playerNameInput.value = savedPlayerName;
+        roomCode = null;
+        isHost = false;
+    });
+
     createRoomBtn.onclick = () => {
+        unlockAudio();
         const name = playerNameInput.value.trim();
         if (!name) {
             lobbyError.textContent = 'Please enter your name';
             return;
         }
+        savedPlayerName = name;
         socket.emit('createRoom', name);
     };
 
     joinRoomBtn.onclick = () => {
+        unlockAudio();
         const name = playerNameInput.value.trim();
         const code = roomCodeInput.value.trim().toUpperCase();
         if (!name) {
@@ -85,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
             lobbyError.textContent = 'Please enter a room code';
             return;
         }
+        savedPlayerName = name;
         socket.emit('joinRoom', { roomCode: code, playerName: name });
     };
 
@@ -165,10 +244,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function updatePlayersList(players) {
         playersList.innerHTML = '';
         
-        players.forEach((player, index) => {
+        const sortedPlayers = [...players].sort((a, b) => (b.wins || 0) - (a.wins || 0));
+        
+        sortedPlayers.forEach((player, index) => {
             const card = document.createElement('div');
             card.className = 'player-card';
-            if (index === 0) card.classList.add('host');
+            if (players.indexOf(player) === 0) card.classList.add('host');
             if (player.id === myPlayerId) card.classList.add('you');
 
             const colorDiv = document.createElement('div');
@@ -179,10 +260,15 @@ document.addEventListener('DOMContentLoaded', () => {
             nameSpan.className = 'player-name';
             nameSpan.textContent = player.name + (player.id === myPlayerId ? ' (You)' : '');
 
+            const winsSpan = document.createElement('span');
+            winsSpan.className = 'player-wins';
+            winsSpan.textContent = `${player.wins || 0} wins`;
+
             card.appendChild(colorDiv);
             card.appendChild(nameSpan);
+            card.appendChild(winsSpan);
 
-            if (index === 0) {
+            if (players.indexOf(player) === 0) {
                 const hostBadge = document.createElement('span');
                 hostBadge.className = 'host-badge';
                 hostBadge.textContent = 'HOST';
@@ -194,6 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     startGameBtn.onclick = () => {
+        unlockAudio();
         socket.emit('startGame');
     };
 
@@ -203,6 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startGame(players) {
         waitingRoom.style.display = 'none';
+        gameEndPopup.style.display = 'none';
         clock.style.display = 'flex';
         playground.style.display = 'block';
         controllers.style.display = 'flex';
@@ -215,7 +303,12 @@ document.addEventListener('DOMContentLoaded', () => {
         btnText.innerText = 'START';
 
         renderPlayers(players);
-        dollImage.src = './Assets/doll back.png';
+        
+        if (imagesPreloaded) {
+            dollImage.src = dollBackImg.src;
+        } else {
+            dollImage.src = './Assets/doll back.png';
+        }
     }
 
     function renderPlayers(players) {
@@ -281,16 +374,27 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('dollTurn', (isLooking) => {
         dollLooking = isLooking;
         if (isLooking) {
-            dollImage.src = './Assets/doll front.png';
+            if (imagesPreloaded) {
+                dollImage.src = dollFrontImg.src;
+            } else {
+                dollImage.src = './Assets/doll front.png';
+            }
             sound.pause();
             sound.currentTime = 0;
         } else {
-            dollImage.src = './Assets/doll back.png';
-            sound.play();
+            if (imagesPreloaded) {
+                dollImage.src = dollBackImg.src;
+            } else {
+                dollImage.src = './Assets/doll back.png';
+            }
+            sound.currentTime = 0;
+            sound.play().catch(e => console.log('Audio play failed:', e));
         }
     });
 
     moveButton.onclick = () => {
+        unlockAudio();
+        
         if (isEliminated || isFinished) return;
 
         if (moving) {
@@ -330,7 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
             moving = false;
             clearInterval(moveInterval);
             btnText.innerText = 'START';
-            playerOutSound.play();
+            playerOutSound.play().catch(e => console.log('Death sound failed:', e));
             eliminationPopup.style.display = 'flex';
             setTimeout(() => {
                 eliminationPopup.style.display = 'none';
@@ -381,7 +485,7 @@ document.addEventListener('DOMContentLoaded', () => {
             data.winners.forEach(w => {
                 const p = document.createElement('p');
                 p.className = 'winner';
-                p.textContent = w.name + (w.id === myPlayerId ? ' (You!)' : '');
+                p.textContent = w.name + (w.id === myPlayerId ? ' (You!)' : '') + ` - Total Wins: ${w.wins || 0}`;
                 gameEndMessage.appendChild(p);
             });
         } else if (data.reason === 'timeout') {
@@ -397,7 +501,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 winners.forEach(w => {
                     const p = document.createElement('p');
                     p.className = 'winner';
-                    p.textContent = w.name + (w.id === myPlayerId ? ' (You!)' : '');
+                    p.textContent = w.name + (w.id === myPlayerId ? ' (You!)' : '') + ` - Total Wins: ${w.wins || 0}`;
                     gameEndMessage.appendChild(p);
                 });
             } else {
@@ -411,6 +515,21 @@ document.addEventListener('DOMContentLoaded', () => {
             p.textContent = 'No survivors this round!';
             gameEndMessage.appendChild(p);
         }
+
+        const leaderboardDiv = document.createElement('div');
+        leaderboardDiv.className = 'leaderboard';
+        leaderboardDiv.innerHTML = '<p><strong>Leaderboard:</strong></p>';
+        
+        const sortedPlayers = [...data.players].sort((a, b) => (b.wins || 0) - (a.wins || 0));
+        sortedPlayers.forEach((player, index) => {
+            const p = document.createElement('p');
+            p.className = 'leaderboard-entry';
+            const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+            p.textContent = `${medal} ${player.name}: ${player.wins || 0} wins`;
+            if (player.id === myPlayerId) p.style.fontWeight = 'bold';
+            leaderboardDiv.appendChild(p);
+        });
+        gameEndMessage.appendChild(leaderboardDiv);
 
         gameEndTitle.textContent = title;
         gameEndPopup.style.display = 'flex';
@@ -436,6 +555,189 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     backToLobbyBtn.onclick = () => {
-        location.reload();
+        socket.emit('leaveRoom');
     };
+
+    socket.on('leftRoom', () => {
+        gameEndPopup.style.display = 'none';
+        clock.style.display = 'none';
+        playground.style.display = 'none';
+        controllers.style.display = 'none';
+        waitingRoom.style.display = 'none';
+        lobbyModal.style.display = 'flex';
+        nameInputSection.style.display = 'block';
+        joinRoomSection.style.display = 'none';
+        playerNameInput.value = savedPlayerName;
+        roomCode = null;
+        isHost = false;
+        myPlayerId = null;
+    });
+
+    let localStream = null;
+    let peerConnections = {};
+    let voiceChatEnabled = false;
+
+    const voiceChatBtn = document.getElementById('voiceChatBtn');
+    const voiceChatStatus = document.getElementById('voiceChatStatus');
+
+    const rtcConfig = {
+        iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' }
+        ]
+    };
+
+    if (voiceChatBtn) {
+        voiceChatBtn.onclick = async () => {
+            if (!roomCode) return;
+            
+            if (!voiceChatEnabled) {
+                try {
+                    localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                    voiceChatEnabled = true;
+                    voiceChatBtn.textContent = 'Mute';
+                    voiceChatBtn.classList.add('active');
+                    if (voiceChatStatus) voiceChatStatus.textContent = 'Voice: ON';
+                    socket.emit('voiceChatJoin', roomCode);
+                } catch (err) {
+                    console.error('Failed to get microphone:', err);
+                    alert('Could not access microphone. Please allow microphone access to use voice chat.');
+                }
+            } else {
+                if (localStream) {
+                    localStream.getTracks().forEach(track => track.stop());
+                    localStream = null;
+                }
+                voiceChatEnabled = false;
+                voiceChatBtn.textContent = 'Voice Chat';
+                voiceChatBtn.classList.remove('active');
+                if (voiceChatStatus) voiceChatStatus.textContent = 'Voice: OFF';
+                
+                Object.keys(peerConnections).forEach(peerId => {
+                    if (peerConnections[peerId]) {
+                        peerConnections[peerId].close();
+                        delete peerConnections[peerId];
+                    }
+                });
+                socket.emit('voiceChatLeave', roomCode);
+            }
+        };
+    }
+
+    socket.on('voiceChatPeers', async (peers) => {
+        if (!voiceChatEnabled || !localStream) return;
+        
+        for (const peerId of peers) {
+            if (peerId !== myPlayerId && !peerConnections[peerId]) {
+                await createPeerConnection(peerId, true);
+            }
+        }
+    });
+
+    socket.on('voiceChatNewPeer', async (peerId) => {
+        if (!voiceChatEnabled || !localStream) return;
+        if (peerId !== myPlayerId && !peerConnections[peerId]) {
+            await createPeerConnection(peerId, true);
+        }
+    });
+
+    socket.on('voiceOffer', async (data) => {
+        if (!voiceChatEnabled) return;
+        
+        const { from, offer } = data;
+        if (!peerConnections[from]) {
+            await createPeerConnection(from, false);
+        }
+        const pc = peerConnections[from];
+        if (pc) {
+            try {
+                await pc.setRemoteDescription(new RTCSessionDescription(offer));
+                const answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
+                socket.emit('voiceAnswer', { to: from, answer });
+            } catch (e) {
+                console.error('Error handling voice offer:', e);
+            }
+        }
+    });
+
+    socket.on('voiceAnswer', async (data) => {
+        const { from, answer } = data;
+        const pc = peerConnections[from];
+        if (pc) {
+            try {
+                await pc.setRemoteDescription(new RTCSessionDescription(answer));
+            } catch (e) {
+                console.error('Error handling voice answer:', e);
+            }
+        }
+    });
+
+    socket.on('voiceIceCandidate', async (data) => {
+        const { from, candidate } = data;
+        const pc = peerConnections[from];
+        if (pc && candidate) {
+            try {
+                await pc.addIceCandidate(new RTCIceCandidate(candidate));
+            } catch (e) {
+                console.error('Error adding ICE candidate:', e);
+            }
+        }
+    });
+
+    socket.on('voiceChatUserLeft', (peerId) => {
+        if (peerConnections[peerId]) {
+            peerConnections[peerId].close();
+            delete peerConnections[peerId];
+        }
+        const remoteAudio = document.getElementById(`audio-${peerId}`);
+        if (remoteAudio) remoteAudio.remove();
+    });
+
+    async function createPeerConnection(peerId, isInitiator) {
+        const pc = new RTCPeerConnection(rtcConfig);
+        peerConnections[peerId] = pc;
+
+        if (localStream) {
+            localStream.getTracks().forEach(track => {
+                pc.addTrack(track, localStream);
+            });
+        }
+
+        pc.ontrack = (event) => {
+            let remoteAudio = document.getElementById(`audio-${peerId}`);
+            if (!remoteAudio) {
+                remoteAudio = document.createElement('audio');
+                remoteAudio.id = `audio-${peerId}`;
+                remoteAudio.autoplay = true;
+                document.body.appendChild(remoteAudio);
+            }
+            remoteAudio.srcObject = event.streams[0];
+        };
+
+        pc.onicecandidate = (event) => {
+            if (event.candidate) {
+                socket.emit('voiceIceCandidate', { to: peerId, candidate: event.candidate });
+            }
+        };
+
+        pc.onconnectionstatechange = () => {
+            if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+                pc.close();
+                delete peerConnections[peerId];
+            }
+        };
+
+        if (isInitiator) {
+            try {
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                socket.emit('voiceOffer', { to: peerId, offer });
+            } catch (e) {
+                console.error('Error creating offer:', e);
+            }
+        }
+
+        return pc;
+    }
 });
