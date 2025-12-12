@@ -300,6 +300,13 @@ body {
   #playAgainButton:hover {
     background-color: #0056b3;
   }
+
+  .popup-btns {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
   
   /* Popup animation */
   @keyframes scaleIn {
