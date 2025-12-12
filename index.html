@@ -8,15 +8,50 @@
     <link rel="icon" type="image/png" sizes="32x32" href="./Assets/favicon_io/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="./Assets/favicon_io/favicon-16x16.png">
     <link rel="manifest" href="./Assets/favicon_io/site.webmanifest">
-    <title>Red light, Green light</title>
+    <title>Red light, Green light - Multiplayer</title>
     <link rel="stylesheet" href="./stylesheets/style.css">
-    <link rel="stylesheet" href="/stylesheets/multiplayerStyles.css">
+    <link rel="stylesheet" href="./stylesheets/multiplayerStyles.css">
+    <script src="/socket.io/socket.io.js"></script>
 </head>
 
 <body>
     <div class="wrapper">
-        <!-- This container will show the rules of the game -->
-        <div id="gameRulesModal" class="modal">
+        <div id="lobbyModal" class="modal">
+            <div class="modal-content lobby-content">
+                <h2>Red Light, Green Light</h2>
+                <p class="subtitle">Multiplayer Edition</p>
+                
+                <div id="nameInputSection">
+                    <input type="text" id="playerNameInput" placeholder="Enter your name" maxlength="12">
+                    <div class="lobby-buttons">
+                        <button id="createRoomBtn" class="lobby-btn create-btn">Create Room</button>
+                        <button id="showJoinBtn" class="lobby-btn join-btn">Join Room</button>
+                    </div>
+                </div>
+
+                <div id="joinRoomSection" style="display: none;">
+                    <input type="text" id="roomCodeInput" placeholder="Enter Room Code" maxlength="6">
+                    <div class="lobby-buttons">
+                        <button id="joinRoomBtn" class="lobby-btn join-btn">Join</button>
+                        <button id="backBtn" class="lobby-btn">Back</button>
+                    </div>
+                </div>
+
+                <p id="lobbyError" class="error-text"></p>
+            </div>
+        </div>
+
+        <div id="waitingRoom" class="modal" style="display: none;">
+            <div class="modal-content waiting-content">
+                <h2>Waiting Room</h2>
+                <p class="room-code">Room Code: <span id="displayRoomCode"></span></p>
+                <div id="playersList" class="players-list"></div>
+                <button id="startGameBtn" class="lobby-btn start-btn" style="display: none;">Start Game</button>
+                <p class="waiting-text" id="waitingText">Waiting for host to start...</p>
+            </div>
+        </div>
+
+        <div id="gameRulesModal" class="modal" style="display: none;">
             <div class="modal-content">
                 <h2>Welcome Player <br> Game Rules: Red Light, Green Light</h2>
                 <ul>
@@ -50,7 +85,7 @@
                         <strong>Tips:</strong>
                         <ul>
                             <li>Be quick but cautious.</li>
-                            <li>Pay attention to the doll’s movements and stop immediately when it turns to face you.
+                            <li>Pay attention to the doll's movements and stop immediately when it turns to face you.
                             </li>
                         </ul>
                     </li>
@@ -59,50 +94,44 @@
             </div>
         </div>
 
-        <!-- When player is eliminated, this will show the popup -->
         <div id="eliminationPopup" class="popup">
             <div class="popup-content">
-                <h2>Player Eliminated</h2>
-                <button id="playAgainButton">Play Again</button>
+                <h2>You've Been Eliminated!</h2>
+                <p>Watch the others finish...</p>
             </div>
         </div>
 
-        <!-- when the player wins, this popup will be shown -->
         <div id="winPopup">
             <div class="win-popup-content">
-                <h2>🎈Congratulations✨</h2>
-                <p>You Won</p>
-                <button id="winPlayAgainButton">Play Again</button>
+                <h2>Congratulations!</h2>
+                <p>You crossed the finish line!</p>
             </div>
         </div>
 
-        <!-- This is the clock in the top -->
-        <div class="clock">
-            <p class="time">00 : <span id="countdown"></span>s</p>
+        <div id="gameEndPopup" class="popup" style="display: none;">
+            <div class="popup-content game-end-content">
+                <h2 id="gameEndTitle">Game Over</h2>
+                <div id="gameEndMessage"></div>
+                <button id="playAgainBtn" class="lobby-btn" style="display: none;">Play Again</button>
+                <button id="backToLobbyBtn" class="lobby-btn">Back to Lobby</button>
+            </div>
         </div>
 
-        <!-- This is the main playground like where the player moves -->
-        <div class="playground">
+        <div class="clock" style="display: none;">
+            <p class="time">00 : <span id="countdown">40</span>s</p>
+        </div>
+
+        <div class="playground" style="display: none;">
             <img src="./Assets/background .png" alt="background image" id="playground-img">
-            <img src="./Assets/player.png" alt="player" id="player">
+            <div id="playersContainer"></div>
         </div>
 
-        <!-- This is where the doll and start stop button will appear -->
-        <div class="controllers">
+        <div class="controllers" style="display: none;">
             <div id="doll">
                 <img src="./Assets/doll front.png" alt="doll" id="dollImage">
             </div>
             <button id="moveButton"><span>START</span></button>
         </div>
-
-        <!-- This popup will give the user to choose multiplayer or singleplayer -->
-         <!-- <div class="choosePopup">
-            <div class="choosePopupContent">
-                <p>Choose mode</p>
-                <button>Single Player</button>
-                <button>Multi Player</button>
-            </div>
-         </div> -->
     </div>
 
     <script src="./scripts/main.js"></script>

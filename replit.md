@@ -1,25 +1,37 @@
-# Red Light, Green Light Game
+# Red Light, Green Light - Multiplayer Game
 
 ## Overview
-A browser-based recreation of the Red Light, Green Light game from Squid Game. Players must reach the finish line before time runs out while avoiding detection when the doll turns around.
+A browser-based multiplayer recreation of the Red Light, Green Light game from Squid Game. Players compete in real-time to reach the finish line before time runs out while avoiding detection when the doll turns around.
 
 ## Project Structure
-- `index.html` - Main game page
-- `scripts/main.js` - Game logic (player movement, doll behavior, win/lose conditions)
-- `stylesheets/` - CSS styling files
+- `server.js` - Node.js backend with Express and Socket.io for real-time multiplayer
+- `index.html` - Main game page with lobby and game UI
+- `scripts/main.js` - Client-side game logic (Socket.io client, player movement, UI)
+- `stylesheets/` - CSS styling files (style.css, multiplayerStyles.css)
 - `Assets/` - Game assets (images, sounds, favicon)
+- `package.json` - Node.js dependencies
 
 ## How to Play
-1. Click "Start Game" to begin
-2. Press START to move the player forward
-3. Press STOP when the doll turns around (red light)
-4. Reach the finish line within 40 seconds to win
-5. If you're moving when the doll is watching, you're eliminated
+1. Enter your name and create a room or join with a room code
+2. Share the room code with friends (up to 8 players)
+3. Host starts the game when everyone is ready
+4. Press START to move, STOP when the doll turns around (red light)
+5. Reach the finish line within 40 seconds to win
+6. If you're moving when the doll is watching, you're eliminated
+
+## Multiplayer Features
+- Real-time player synchronization via Socket.io
+- Room-based matchmaking with shareable codes
+- Up to 8 players per room
+- Synchronized doll behavior for all players
+- Live player positions visible to everyone
+- Game state: waiting, playing, ended
 
 ## Technical Details
-- Pure HTML/CSS/JavaScript - no build process required
-- Static file hosting on port 5000
-- No backend or database required
+- Backend: Node.js + Express + Socket.io
+- Frontend: Vanilla JavaScript with Socket.io client
+- Port: 5000 (Express server with static files)
+- No database required (in-memory game rooms)
 
 ## Deployment
-Static deployment serving files from root directory.
+Autoscale deployment running Node.js server.

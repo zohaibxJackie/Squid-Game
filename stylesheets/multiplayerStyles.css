@@ -9,3 +9,267 @@
     --score-text-color: hsl(229, 64%, 46%);
 }
 
+.lobby-content {
+    max-width: 400px;
+}
+
+.lobby-content h2 {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    font-size: 0.7rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+#playerNameInput,
+#roomCodeInput {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    font-family: var(--primary-font);
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+#playerNameInput:focus,
+#roomCodeInput:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.lobby-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.lobby-btn {
+    padding: 12px 20px;
+    font-size: 12px;
+    font-family: var(--primary-font);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.create-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.create-btn:hover {
+    background-color: #218838;
+}
+
+.join-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+.join-btn:hover {
+    background-color: #0056b3;
+}
+
+.start-btn {
+    background-color: #ffc107;
+    color: #333;
+    width: 100%;
+    margin-top: 15px;
+    animation: pulse 2s infinite;
+}
+
+.start-btn:hover {
+    background-color: #e0a800;
+    animation: none;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+.error-text {
+    color: #dc3545;
+    font-size: 10px;
+    margin-top: 10px;
+    min-height: 15px;
+}
+
+.waiting-content {
+    max-width: 450px;
+}
+
+.room-code {
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.room-code span {
+    background-color: #333;
+    color: #fff;
+    padding: 5px 15px;
+    border-radius: 5px;
+    letter-spacing: 3px;
+}
+
+.players-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 15px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.player-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 2px solid transparent;
+}
+
+.player-card.host {
+    border-color: #ffc107;
+}
+
+.player-card.you {
+    background-color: #e3f2fd;
+}
+
+.player-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.player-name {
+    font-size: 10px;
+}
+
+.host-badge {
+    font-size: 8px;
+    background-color: #ffc107;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+.waiting-text {
+    font-size: 10px;
+    color: #666;
+    margin-top: 10px;
+}
+
+#playersContainer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.multiplayer-sprite {
+    position: absolute;
+    width: 40px;
+    bottom: 20px;
+    transition: left 0.05s linear;
+    z-index: 10;
+}
+
+.multiplayer-sprite.eliminated {
+    filter: grayscale(100%) opacity(50%);
+}
+
+.multiplayer-sprite.finished {
+    filter: brightness(1.3) drop-shadow(0 0 8px gold);
+}
+
+.player-label {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    font-family: var(--primary-font);
+    white-space: nowrap;
+    padding: 2px 5px;
+    border-radius: 3px;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.game-end-content {
+    max-width: 400px;
+}
+
+.game-end-content h2 {
+    margin-bottom: 15px;
+}
+
+#gameEndMessage {
+    font-size: 11px;
+    margin-bottom: 15px;
+    line-height: 1.8;
+}
+
+#gameEndMessage .winner {
+    color: #28a745;
+    font-weight: bold;
+}
+
+#gameEndMessage .eliminated-player {
+    color: #dc3545;
+}
+
+.status-indicator {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-family: var(--primary-font);
+    z-index: 100;
+}
+
+.status-indicator.safe {
+    background-color: #28a745;
+    color: white;
+}
+
+.status-indicator.danger {
+    background-color: #dc3545;
+    color: white;
+    animation: blink 0.5s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.you-indicator {
+    position: absolute;
+    bottom: calc(100% + 15px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 16px;
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-5px); }
+}
